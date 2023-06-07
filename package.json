@@ -13,6 +13,8 @@
   "author": "Platform.sh",
   "license": "MIT",
   "dependencies": {
+    "@forestadmin/agent": "^1.9.2",
+    "@forestadmin/datasource-sql": "^1.6.4",
     "express": "^4.17.1",
     "mysql2": "^1.6.5",
     "platformsh-config": "^2.0.0"

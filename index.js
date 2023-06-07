@@ -1,6 +1,8 @@
 const app = require('express')();
 const config = require("platformsh-config").config();
 const mysql = require("mysql2/promise");
+const { createAgent } = require('@forestadmin/agent');
+const { createSqlDataSource } = require('@forestadmin/datasource-sql');
 
 function openConnection() {
   const credentials = config.credentials("database");
@@ -38,6 +40,18 @@ function readData(connection) {
 function dropTable(connection) {
   return connection.execute("DROP TABLE platforminfo");
 }
+
+// Add Forest Admin
+// This must be called BEFORE all other middleware on the app
+createAgent({
+  authSecret: process.env.FOREST_AUTH_SECRET,
+  envSecret: process.env.FOREST_ENV_SECRET,
+  isProduction: process.env.NODE_ENV === 'production',
+
+})
+  .addDataSource(createSqlDataSource(`mariadb://${credentials.username}:${credentials.password}@${credentials.hostname}:${credentials.port}/${credentials.path}?schema=${credentials.scheme}`))
+  .mountOnExpress(app)
+  .start();
 
 // Define the main route.
 app.get('/', async function(req, res){
